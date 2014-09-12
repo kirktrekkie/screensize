@@ -1,0 +1,99 @@
+*{
+	margin: 0px;
+	padding: 0px;
+}
+
+h1{
+	font: bold 20px Tahoma;
+}
+
+h3{
+	font: bold 12px Tahoma;
+}
+
+header, section, footer, aside, nav, article, hgroup{
+	display:block;
+}
+
+body{
+	text-align:center;
+}
+
+header{
+	font: bold 14px Tahoma;
+}
+
+#big_wrapper{
+	border: 1px solid black;
+	width:1000px;
+	margin: 20px auto;
+}
+
+#top_header{
+	background:#648864;
+	padding: 10px;
+}
+
+#current{
+	float:left;
+	width:200px;
+}
+
+#screen1stat, #screen2stat, #diff{
+	float:left;
+	margin: 10px;
+	padding: 5px;
+	background: #bbbbbb;
+	border: 1px dotted black;
+	width: 150px;
+}
+
+
+#screeninput{
+
+}
+
+#screen1,#screen2{
+	float:left;
+	padding: 5px;
+	width:45%;
+}
+
+.screens{
+	float:left;
+	position:relative;
+}
+
+.drawscreen{
+	float:left;
+	position:relative;
+	z-index:2;
+}
+
+.drawscreen2{
+	position:relative;
+	z-index:1;
+	top: 0px;
+	left: 0px;
+}
+
+#side_news{
+	border: 1px dotted black;
+	float: right;
+	width: 220px;
+	margin: 10px 0px;
+	padding: 10px;
+	background: #bbbbbb;
+}
+
+#the_footer{
+	clear:both;
+	text-align:center;
+	padding: 15px;
+	border-top: 1px dashed;
+}
+
+#cookieinfo{
+	font-size: 10px;
+	font-style:italic;
+}

@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+	<meta charset="UTF-8">
+	<title>Skärmstorlek</title>
+	<link rel="stylesheet" href ="screensize.css">
+	<script type="text/javascript"> 
+	
+		var list = [
+		{phone:"Apple Iphone 5S", screenx:640,screeny:1136,diag:4},
+		{phone:"Samsung Galaxy S5", screenx:1080,screeny:1920,diag:5.1},
+		{phone:"Samsung Galaxy Note 4", screenx:1440,screeny:2560,diag:5.7},
+		{phone:"Sony Xperia Z2", screenx:1080,screeny:1920,diag:5.2},
+		{phone:"LG G3", screenx:1440,screeny:2560,diag:5.5},
+		{phone:"HTC One (M8)", screenx:1080,screeny:1920,diag:5},
+		{phone:"Nokia Lumia 1520", screenx:1080,screeny:1920,diag:6},
+		{phone:"Blackberry Passport", screenx:1440,screeny:1440,diag:4.5},
+		{phone:"HTC 8X", screenx:720,screeny:1280,diag:4.3},
+		{phone:"TV 32 tum HD", screenx:720,screeny:1280,diag:32},
+		{phone:"TV 50 tum FullHD", screenx:1080,screeny:1920,diag:50},
+		{phone:"Annan", screenx:480,screeny:800,diag:4}
+		];
+		
+		function init()
+		{
+			readcookie();
+			var phonelistvar = document.getElementById("phonelist");
+			var phonelistvar2 = document.getElementById("phonelist2");
+			
+			populatelist(phonelistvar);
+			populatelist(phonelistvar2);
+			
+			phonelistvar.selectedIndex = 1;
+			phonelistvar2.selectedIndex = 2;
+			
+			selectphone("phonelist");
+			selectphone("phonelist2");
+		}
+		
+		function calculateSize()
+		{
+			
+			var numDiagonal = document.getElementById("numDiagonal");
+			var numXpix = document.getElementById("numXpix");
+			var numYpix = document.getElementById("numYpix");
+			
+			var diagonal = numDiagonal.value;
+			var xpix = numXpix.value;
+			var ypix = numYpix.value;
+			
+			var numDiagonal2 = document.getElementById("numDiagonal2");
+			var numXpix2 = document.getElementById("numXpix2");
+			var numYpix2 = document.getElementById("numYpix2");
+			
+			var diagonal2 = numDiagonal2.value;
+			var xpix2 = numXpix2.value;
+			var ypix2 = numYpix2.value;
+			
+			var history = document.getElementById("outputhistory").innerHTML;
+			
+			//[screenArea, lengthX, lengthY, pixPerInch] = docalculation(diagonal, xpix, ypix);
+			returns = docalculation(diagonal, xpix, ypix);
+			screenArea = returns[0];
+			lengthX = returns[1];
+			lengthY = returns[2];
+			pixPerInch = returns[3];
+			
+			
+			//draw a rectangle representing the screen size
+			if(lengthX *40 < 530)
+			{
+				drawscreen.innerHTML = "<div style='width:" + lengthX*40 + "px;height:" + lengthY*40 +"px;border:2px solid #000;margin:10px'>";
+			}else{
+				drawscreen.innerHTML = "Skärmen för stor för att rita ut.";
+			}
+			name = document.getElementById("phonelist").options[document.getElementById("phonelist").selectedIndex].text;
+			printscreenstat(screen1stat,screenArea,lengthX,lengthY,pixPerInch,name);
+			
+			if (document.getElementById("screen2").style.visibility == "visible")
+			{
+				//[screenArea2, lengthX2, lengthY2, pixPerInch2] = docalculation(diagonal2, xpix2, ypix2);
+				returns2 = docalculation(diagonal2, xpix2, ypix2);
+				screenArea2 = returns2[0];
+				lengthX2 = returns2[1];
+				lengthY2 = returns2[2];
+				pixPerInch2 = returns2[3];
+				name2 = document.getElementById("phonelist2").options[document.getElementById("phonelist2").selectedIndex].text;
+				printscreenstat(screen2stat,screenArea2,lengthX2,lengthY2,pixPerInch2,name2);
+				if(lengthX2 *40 < 530)
+				{
+					drawscreen2.innerHTML = "<div style='width:" + lengthX2*40 + "px;height:" + lengthY2*40 +"px;border:2px solid #00F;margin:10px'>";
+				}else{
+					drawscreen2.innerHTML = ""
+				}
+				document.getElementById("screen2stat").style.visibility="visible";
+				document.getElementById("diff").style.visibility="visible";
+				
+				diffproc = Math.round((screenArea2)/screenArea*100);
+				if ((screenArea - screenArea2) > 0)
+				{
+					diffproc = Math.round((screenArea - screenArea2)/screenArea*100);
+					diffstring = "Skärm 2 är " + diffproc + "  % mindre än Skärm 1";
+				}else if ((screenArea - screenArea2) < 0) {
+					diffproc = Math.round((screenArea - screenArea2)/screenArea*100);
+					diffstring = "Skärm 2 är " + Math.abs(diffproc) + "  % större än Skärm 1";
+				}else{
+					diffstring = "Skärmarna är lika stora";
+				}
+				
+				diff.innerHTML = "<header>Skillnad</header>"+diffstring+"</div>";
+				
+			}else{
+				screen2stat.innerHTML = "";
+				drawscreen2.innerHTML = "";
+				diff.innerHTML = "";
+				document.getElementById("screen2stat").style.visibility="collapse";
+				document.getElementById("diff").style.visibility="collapse";
+			}
+			
+			outputhistory.innerHTML = name + " - " + diagonal + ": " + screenArea + "cm&#178" + "<br>" + history;
+		}
+		
+		function docalculation(diag, x, y)
+		{
+			pixSize = diag*2.54/Math.sqrt(Math.pow(x,2)+Math.pow(y,2));
+			
+			lenx = Math.round(pixSize*x*100)/100;
+			leny = Math.round(pixSize*y*100)/100;
+			
+			area = Math.round(lenx*leny*100)/100;
+			
+			ppi = Math.round(Math.sqrt(Math.pow(x,2)+Math.pow(y,2))/diag);
+			
+			return [area, lenx, leny, ppi];
+		}
+		
+		function printscreenstat(printarea,screenArea,lengthX,lengthY,pixPerInch,name)
+		{
+			printarea.innerHTML = "<header>Skärmstorlek</header>"+
+			"<div>" + name + "</div>" +
+			"<div>Skärmarea:"  + screenArea + "cm&#178</div>" +
+			"<div>Skärmbredd: " + lengthX + " cm</div>" +
+			"<div>Skärmhöjd: " + lengthY + " cm</div>" +
+			"<div>Pixlar per tum: " + pixPerInch + "</div>";
+			
+			//divadd = document.createElement("div");
+			//divadd.textContent = "Hej";
+			//printarea.appendChild(divadd);
+		}
+		
+		function addmorescreen()
+		{
+			if (document.getElementById("screen2").style.visibility == "collapse")
+			{
+				document.getElementById("screen2").style.visibility="visible";
+				add_remove.innerHTML = "Ta bort skärm";
+			}else{
+				document.getElementById("screen2").style.visibility="collapse";
+				add_remove.innerHTML = "Lägg till skärm";
+			}
+		}
+
+		function selectphone(listid){
+			//document.getElementById("log").innerHTML = listid;
+			elt = document.getElementById(listid);
+			selectedphone = elt.options[elt.selectedIndex].text;
+			for(var i = 0; i < list.length; i++) {
+				if (listid == "phonelist"){
+					if (selectedphone == list[i].phone){
+						document.getElementById("numDiagonal").value=list[i].diag;
+						document.getElementById("numXpix").value=list[i].screenx;
+						document.getElementById("numYpix").value=list[i].screeny;
+					}
+				}else if(listid == "phonelist2"){
+					if (selectedphone == list[i].phone){
+						document.getElementById("numDiagonal2").value=list[i].diag;
+						document.getElementById("numXpix2").value=list[i].screenx;
+						document.getElementById("numYpix2").value=list[i].screeny;
+					}
+				}
+			}
+			calculateSize();
+			
+			hidenewfunc();
+		}
+		
+		function populatelist(selectid)
+		{
+			list.sort(function(a,b){
+				return ((a.phone < b.phone) ? -1 : ((a.phone > b.phone) ? 1 : 0))
+			})
+			while (selectid.firstChild) {
+				selectid.removeChild(selectid.firstChild);
+			}
+			for(var i = 0; i < list.length; i++) 
+			{
+				var phone = list[i].phone;
+				var add = document.createElement("option");
+				add.textContent = phone;
+				add.value = phone;
+				add.id = phone;
+				selectid.appendChild(add);
+			}
+		}
+		
+		function otherphone(listid)
+		{
+			index = document.getElementById(listid).options.namedItem("Annan").index;
+			//document.getElementById("log").innerHTML = index;
+			document.getElementById(listid).selectedIndex = index;
+			shownewfunc();
+			calculateSize();
+		}
+		
+		function addnewphone(){
+			i = list.length;
+			list.push({phone:document.getElementById("newname").value,
+			diag:document.getElementById("numDiagonal").value,
+			screenx:document.getElementById("numXpix").value,
+			screeny:document.getElementById("numYpix").value,
+			});
+			populatelist(document.getElementById("phonelist"));
+			populatelist(document.getElementById("phonelist2"));
+			savecookie();
+			
+		}
+		
+		function savecookie(){
+			for(i=0;i<list.length;i++){
+				document.cookie=i + "phone = " + list[i].phone + "%" + list[i].screenx + "%" + list[i].screeny + "%" + list[i].diag;
+			}
+		}
+		
+		function readcookie(){
+			var ca = document.cookie.split(';');
+			//document.getElementById("log").innerHTML = ca;
+			if (ca == ""){
+				//do nothing
+			}else{
+				list = [];
+				for(var i=0; i<ca.length; i++) {
+					tempphone = ca[i].split('=');
+					if(tempphone[0].substring(tempphone[0].length-5,tempphone[0].length) == "phone"){
+						tempvalues = tempphone[1].split('%');
+						//document.getElementById("log").innerHTML = tempvalues;
+						//list[i].phone=tempvalues[0];
+						//list[i].screenx=tempvalues[1];
+						//list[i].screeny=tempvalues[2];
+						//list[i].diag=tempvalues[3];
+						list.push({phone:tempvalues[0],
+						diag:tempvalues[3],
+						screenx:tempvalues[1],
+						screeny:tempvalues[2],
+						});
+					}
+				}
+			}
+		}
+		
+		function shownewfunc(){
+			document.getElementById("newnamelabel").style.visibility="visible";
+			document.getElementById("newname").style.visibility="visible";
+			document.getElementById("newnamebutton").style.visibility="visible";
+		}
+		
+		function hidenewfunc(){
+			document.getElementById("newnamelabel").style.visibility="collapse";
+			document.getElementById("newname").style.visibility="collapse";
+			document.getElementById("newnamebutton").style.visibility="collapse";
+		}
+	</script>
+</head>
+
+<body onload = "init()">
+<div id="big_wrapper">
+	<header id="top_header">
+		<img id="icon" src="icon2.png"/>
+	</header>
+	<p>Räkna ut hur stor arean på en skärm är.</p>
+	<p>Notera att fyrkanterna inte visar den faktiska storleken på skärmarna utan endast är till för relativ jämförelse.</p>
+	<form action="">
+		<fieldset id="screenfield">
+		<div id="screeninput">
+			<div id="screen1">
+				<h3>Skärm 1:</h3>
+				<p><select id="phonelist" onchange="selectphone('phonelist')"></select></p>
+				
+				<p><label for = "numDiagonal">Diagonal i tum</label>
+				<input type = "number" id="numDiagonal" step=0.1 onchange="otherphone('phonelist')"/></p>
+				
+				<p><label for = "numXpix">Upplösning X</label>
+				<input type = "number" id="numXpix" step=1 onchange="otherphone('phonelist')"/></p>
+				
+				<p><label for = "numYpix">Upplösning Y</label>
+				<input type = "number" id="numYpix" step=1 onchange="otherphone('phonelist')"/></p>
+				
+				<p><label id="newnamelabel" for="newname" style="visibility:collapse;">Ny skärm</label>
+				<input type = "text" id="newname" style="visibility:collapse;"/>
+				<button id="newnamebutton" style="visibility:collapse;" onclick="addnewphone()" type="button">Spara</button></p>
+			</div>
+			<div id="screen2" style="visibility:visible;">
+				<h3>Skärm 2:</h3>
+				<p><select id="phonelist2" onchange="selectphone('phonelist2')"></select>
+				
+				<p><label for = "numDiagonal2">Diagonal i tum</label>
+				<input type = "number" id="numDiagonal2" step=0.1 onchange="otherphone('phonelist2')"/></p>
+				
+				<p><label for = "numXpix2">Upplösning X</label>
+				<input type = "number" id="numXpix2" step=1 onchange="otherphone('phonelist2')"/></p>
+				
+				<p><label for = "numYpix2">Upplösning Y</label>
+				<input type = "number" id="numYpix2" step=1 onchange="otherphone('phonelist2')"/></p>
+			</div>
+			<div>
+			<!-- <button id="calculate" onclick = "calculateSize()" type="button">Räkna ut</button> -->
+			<!-- <button id="add_remove" onclick="addmorescreen()" type="button">Lägg till skärm</button> -->
+			<!-- <button id="select_phone" onclick="selectphone()" type="button">Välj telefon</button> -->
+			</div>
+		</div>
+		</fieldset>
+	</form>
+	<section id="current">
+		<section id="screen1stat">
+			<header>Skärmstorlek</header>
+		</section>
+		<section id="screen2stat" style="visibility:collapse;">
+		</section>
+		<section id="diff" style="visibility:collapse;">
+		</section>
+	</section>
+	<div class="screens">
+		<div id="drawscreen" class="drawscreen"></div>
+		<div id="drawscreen2" class="drawscreen2"></div>
+	</div>
+	
+	<aside id="side_news">
+		<header>Historik</header>
+		<div id="outputhistory"></div>
+	</aside>
+	
+	<footer id="the_footer">
+		<div id="copyright">- Copyright Mina mobiler 2013 -</div>
+		<div id="feedback">Frågor eller åsikter om sidan? Skicka ett mail till <a href="mailto:skarmstorlek@minamobiler.webege.com">Skärmstorlek</a></div>
+		<div id="cookieinfo">Denna sida använder cookies för att spara och ladda egna mobilvärden. Genom att klicka på knappen Spara accepterar du att cookies sparas</div>
+	</footer>
+</div>
+<p id="log"></p>
+</body>
+</html>
